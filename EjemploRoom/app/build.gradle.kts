@@ -39,6 +39,11 @@ android {
     buildFeatures {
         compose = true
     }
+
+    testOptions {
+        animationsDisabled = true
+    }
+
 }
 
 dependencies {
@@ -70,4 +75,12 @@ dependencies {
 
     //IMAGENES PREGUNTAR AL PROFE
     implementation("io.coil-kt:coil-compose:2.4.0")
+
+    //dependencias pruebas
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.0")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.0")
+
+    // Para usar Navigation en pruebas
+    androidTestImplementation("androidx.navigation:navigation-testing:2.7.5")
+
 }
