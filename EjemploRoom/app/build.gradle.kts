@@ -40,10 +40,16 @@ android {
         compose = true
     }
 
-    testOptions {
-        animationsDisabled = true
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/LICENSE.md"
+            excludes += "/META-INF/LICENSE-notice.md"
+            excludes += "/META-INF/licenses/ASM"
+            excludes += "META-INF/INDEX.LIST"
+            excludes += "META-INF/io.netty.versions.properties"
+        }
     }
-
 }
 
 dependencies {
@@ -56,6 +62,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -73,14 +80,27 @@ dependencies {
     implementation(libs.room.ktx)
     kapt(libs.room.compiler)
 
-    //IMAGENES PREGUNTAR AL PROFE
+    //IMAGENES PREGUNTAR ALÑ PROFE
     implementation("io.coil-kt:coil-compose:2.4.0")
 
-    //dependencias pruebas
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.0")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.0")
+    //Retrofit APIREST
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
 
-    // Para usar Navigation en pruebas
-    androidTestImplementation("androidx.navigation:navigation-testing:2.7.5")
+    // TESTING - Unit tests (JVM)
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
+    // TESTING - UI tests (Android)
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.5.4")
+
+    // TESTING - Debug
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.4")
+
+
+
 
 }

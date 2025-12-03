@@ -10,6 +10,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,9 +23,22 @@ import androidx.compose.ui.unit.sp
 import com.example.ejemploroom.viewmodel.FormularioViewModel
 
 @Composable
-fun LoginScreen(viewModel: FormularioViewModel) {
+fun LoginScreen(
+    onLoginExitoso: () -> Unit,
+    onVolverInicio: () -> Unit,
+    viewModel: FormularioViewModel
+) {
     var nombre by remember { mutableStateOf("") }
     var contrasena by remember { mutableStateOf("") }
+    var mensajeError by remember { mutableStateOf("") }
+    val usuarioActual by viewModel.usuarioActual.collectAsState()
+
+    // Observar cambios en usuarioActual
+    LaunchedEffect(usuarioActual) {
+        if (usuarioActual != null) {
+            onLoginExitoso()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -39,9 +54,20 @@ fun LoginScreen(viewModel: FormularioViewModel) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        if (mensajeError.isNotEmpty()) {
+            Text(
+                text = mensajeError,
+                color = androidx.compose.ui.graphics.Color.Red
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
         OutlinedTextField(
             value = nombre,
-            onValueChange = { nombre = it },
+            onValueChange = {
+                nombre = it
+                mensajeError = ""
+            },
             label = { Text(text = "Nombre de usuario") },
             modifier = Modifier.fillMaxWidth()
         )
@@ -50,7 +76,10 @@ fun LoginScreen(viewModel: FormularioViewModel) {
 
         OutlinedTextField(
             value = contrasena,
-            onValueChange = { contrasena = it },
+            onValueChange = {
+                contrasena = it
+                mensajeError = ""
+            },
             label = { Text(text = "Contraseña") },
             modifier = Modifier.fillMaxWidth()
         )
@@ -61,6 +90,9 @@ fun LoginScreen(viewModel: FormularioViewModel) {
             onClick = {
                 if (nombre.isNotBlank() && contrasena.isNotBlank()) {
                     viewModel.iniciarSesion(nombre, contrasena)
+                    // El LaunchedEffect se encargará de la navegación
+                } else {
+                    mensajeError = "Por favor completa todos los campos"
                 }
             },
             modifier = Modifier.fillMaxWidth()
@@ -71,7 +103,7 @@ fun LoginScreen(viewModel: FormularioViewModel) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { viewModel.irAInicio() },
+            onClick = onVolverInicio,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "Volver al Inicio", fontSize = 16.sp)

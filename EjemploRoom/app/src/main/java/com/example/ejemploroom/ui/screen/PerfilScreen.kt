@@ -13,6 +13,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -21,15 +22,19 @@ import androidx.compose.ui.unit.sp
 import com.example.ejemploroom.viewmodel.FormularioViewModel
 
 @Composable
-fun PerfilScreen(viewModel: FormularioViewModel) {
-    val usuarioActual = viewModel.usuarioActual.collectAsState().value
+fun PerfilScreen(
+    onVolverCatalogo: () -> Unit,
+    onCerrarSesion: () -> Unit,
+    viewModel: FormularioViewModel
+) {
+    val usuarioActual by viewModel.usuarioActual.collectAsState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // botones superioreesx
+        // Header
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -42,7 +47,7 @@ fun PerfilScreen(viewModel: FormularioViewModel) {
             )
 
             Button(
-                onClick = { viewModel.irACatalogo() }
+                onClick = onVolverCatalogo
             ) {
                 Text("Volver al Catálogo")
             }
@@ -50,7 +55,8 @@ fun PerfilScreen(viewModel: FormularioViewModel) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        if (usuarioActual != null) {
+        // SOLUCIÓN: Usar usuarioActual?.let {} en lugar de if directo
+        usuarioActual?.let { usuario ->
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -67,23 +73,37 @@ fun PerfilScreen(viewModel: FormularioViewModel) {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    InfoRow("Nombre:", usuarioActual.nombre)
-                    InfoRow("RUT:", usuarioActual.rut)
-                    InfoRow("Correo:", usuarioActual.correo)
-                    InfoRow("Edad:", usuarioActual.edad)
+                    InfoRow("Nombre:", usuario.nombre)
+                    InfoRow("RUT:", usuario.rut)
+                    InfoRow("Correo:", usuario.correo)
+                    InfoRow("Edad:", usuario.edad)
 
                     Spacer(modifier = Modifier.height(24.dp))
 
                     Button(
-                        onClick = { viewModel.cerrarSesion() },
+                        onClick = {
+                            viewModel.cerrarSesion()
+                            onCerrarSesion()
+                        },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text("Cerrar Sesión")
                     }
                 }
             }
-        } else {
-            Text("No hay usuario logueado")
+        } ?: run {
+            // Caso cuando usuarioActual es null
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("No hay usuario logueado")
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = onCerrarSesion) {
+                    Text("Volver al Inicio")
+                }
+            }
         }
     }
 }

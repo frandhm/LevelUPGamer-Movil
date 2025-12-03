@@ -16,9 +16,6 @@ class FormularioViewModel(private val usuarioDao: UsuarioDao) : ViewModel() {
     private val _usuarioActual = MutableStateFlow<Usuario?>(null)
     val usuarioActual: StateFlow<Usuario?> = _usuarioActual.asStateFlow()
 
-    private val _navegacion = MutableStateFlow<String>("inicio")
-    val navegacion: StateFlow<String> = _navegacion.asStateFlow()
-
     init {
         cargarUsuarios()
     }
@@ -39,43 +36,18 @@ class FormularioViewModel(private val usuarioDao: UsuarioDao) : ViewModel() {
                 contrasena = contrasena
             )
             usuarioDao.insertar(nuevoUsuario)
-            cargarUsuarios()
-            irAInicio()
+            cargarUsuarios() // Esto asegura que la lista se actualice
         }
     }
 
     fun iniciarSesion(nombre: String, contrasena: String) {
         viewModelScope.launch {
             val usuario = usuarioDao.validarUsuario(nombre, contrasena)
-            if (usuario != null) {
-                _usuarioActual.value = usuario
-                irACatalogo()
-            }
+            _usuarioActual.value = usuario
         }
-    }
-
-    fun irARegistro() {
-        _navegacion.value = "registro"
-    }
-
-    fun irALogin() {
-        _navegacion.value = "login"
-    }
-
-    fun irAInicio() {
-        _navegacion.value = "inicio"
-    }
-
-    fun irACatalogo() {
-        _navegacion.value = "catalogo"
-    }
-
-    fun irAPerfil() {
-        _navegacion.value = "perfil"
     }
 
     fun cerrarSesion() {
         _usuarioActual.value = null
-        irAInicio()
     }
 }
